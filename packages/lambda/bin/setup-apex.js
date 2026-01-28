@@ -5,7 +5,22 @@ const mkdirp = require('mkdirp')
 
 dotenv.config({path: `${__dirname}/../../../.env`})
 
-let awsResourceIDs = require('../build/aws_resource_ids.json')
+const isOfflineBuild = process.env.SKIP_AWS_FETCH === '1' || process.env.SKIP_AWS_FETCH === 'true'
+let awsResourceIDs
+try {
+  awsResourceIDs = require('../build/aws_resource_ids.json')
+} catch (error) {
+  if (isOfflineBuild) {
+    awsResourceIDs = [
+      {
+        OutputKey: 'LambdaRoleArn',
+        OutputValue: process.env.LAMBDA_ROLE_ARN || 'arn:aws:iam::000000000000:role/OfflineBuildRole'
+      }
+    ]
+  } else {
+    throw error
+  }
+}
 
 const getArn = (resourceIDs, keyName) => {
   let arn
@@ -29,7 +44,7 @@ const apexProjectTemplate = {
   description: 'Lambda Functions for LambStatus',
   memory: 128,
   timeout: 30,
-  runtime: 'nodejs10.x',
+  runtime: 'nodejs18.x',
   shim: false,
   role: lambdaRoleArn,
   nameTemplate: '{{.Project.Name}}-{{.Function.Name}}'

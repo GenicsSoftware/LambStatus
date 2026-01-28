@@ -59,7 +59,6 @@ module.exports = {
   },
   target: 'node',
   externals: {
-    'aws-sdk': 'commonjs aws-sdk',
     'spawn-sync': 'spawn-sync'
   },
   module: {

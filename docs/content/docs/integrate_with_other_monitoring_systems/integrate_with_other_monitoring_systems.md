@@ -6,7 +6,7 @@ type: "doc"
 
 LambStatus has the APIs to integrate with other systems. The APIs enable you to change the component's status, create a new incident and so on.
 
-This page introduces the **Metrics API**. With this, you can submit the metrics data your monitoring systems collect and show the data in the status page. Read [the API docs](https://lambstatus.github.io/apidocs/) for other APIs.
+This page introduces the **Metrics API**. With this, you can submit the metrics data your monitoring systems collect and show the data in the status page. Read [the API docs](https://genicssoftware.github.io/lambstatus.github.io/apidocs/) for other APIs.
 
 ### Set up
 
@@ -26,7 +26,7 @@ At first, you need to create a metric to submit your data points.
 
 ### Submit the data points
 
-Now you can submit the data points using the API. The steps below use the python script prepared for this, but you may write your own script seeing [the API docs](https://lambstatus.github.io/apidocs/#submit-data-points).
+Now you can submit the data points using the API. The steps below use the python script prepared for this, but you may write your own script seeing [the API docs](https://genicssoftware.github.io/lambstatus.github.io/apidocs/#submit-data-points).
 
 1. Click the 'Preview' button of the metric you've just created.
 

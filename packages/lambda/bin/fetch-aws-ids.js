@@ -6,6 +6,26 @@ const AWS = require('aws-sdk')
 
 dotenv.config({path: `${__dirname}/../../../.env`})
 
+const isOfflineBuild = process.env.SKIP_AWS_FETCH === '1' || process.env.SKIP_AWS_FETCH === 'true'
+
+const writeOutputs = (outputs) => {
+  const json = JSON.stringify(outputs, null, 2)
+  const buildDir = path.normalize(`${__dirname}/../build`)
+  mkdirp.sync(buildDir)
+  fs.writeFileSync(`${buildDir}/aws_resource_ids.json`, json)
+  console.log('aws_resource_ids.json created')
+}
+
+if (isOfflineBuild) {
+  writeOutputs([
+    {
+      OutputKey: 'LambdaRoleArn',
+      OutputValue: process.env.LAMBDA_ROLE_ARN || 'arn:aws:iam::000000000000:role/OfflineBuildRole'
+    }
+  ])
+  process.exit(0)
+}
+
 const describeStack = (cloudFormation, stackName) => {
   return new Promise((resolve, reject) => {
     const params = {
@@ -34,10 +54,7 @@ const cloudFormation = new AWS.CloudFormation({ region })
 describeStack(cloudFormation, stackName).then((stack) => {
   return JSON.stringify(stack.Outputs, null, 2)
 }).then((json) => {
-  const buildDir = path.normalize(`${__dirname}/../build`)
-  mkdirp.sync(buildDir)
-  fs.writeFileSync(`${buildDir}/aws_resource_ids.json`, json)
-  console.log('aws_resource_ids.json created')
+  writeOutputs(JSON.parse(json))
 }).catch((error) => {
   console.error(error, error.stack)
   process.exit(1)

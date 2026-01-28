@@ -1,7 +1,7 @@
 module.exports = {
   siteTitleInHeader: "LambStatus", // Site title.
   siteTitle: "Serverless Status Page system", // Site title.
-  siteUrl: "https://lambstatus.github.io", // Domain of your website without pathPrefix.
+  siteUrl: "https://genicssoftware.github.io/lambstatus.github.io", // Domain of your website without pathPrefix.
   pathPrefix: "/", // Prefixes all links. For cases when deployed to example.github.io/gatsby-advanced-starter/.
   siteDescription: "Build and maintain your status page with minimum effort and cost", // Website description used for meta description tag.
   logoForMetatag: "/logos/logo-metatag.png",
@@ -10,7 +10,7 @@ module.exports = {
   userTwitter: "LambStatus",
   // Links to social profiles/projects you want to display in the author segment/navigation bar.
   userLinks: {
-    APIDoc: "https://lambstatus.github.io/apidocs/",
+    APIDoc: "https://genicssoftware.github.io/lambstatus.github.io/apidocs/",
     GitHub: "https://github.com/ks888/LambStatus",
     Twitter: "https://twitter.com/LambStatus"
   },

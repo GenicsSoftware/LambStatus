@@ -61,6 +61,60 @@ export default class S3 {
     })
   }
 
+  async listAllObjects (region, bucketName, path) {
+    const awsS3 = new AWS.S3({ region })
+    const objects = []
+    let continuationToken
+    do {
+      const params = {
+        Bucket: bucketName,
+        Prefix: path
+      }
+      if (continuationToken) {
+        params.ContinuationToken = continuationToken
+      }
+      // eslint-disable-next-line no-await-in-loop
+      const result = await new Promise((resolve, reject) => {
+        awsS3.listObjectsV2(params, (err, data) => {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(data)
+        })
+      })
+      if (result.Contents && result.Contents.length > 0) {
+        objects.push(...result.Contents)
+      }
+      continuationToken = result.IsTruncated ? result.NextContinuationToken : undefined
+    } while (continuationToken)
+    return objects
+  }
+
+  async deleteObjects (region, bucketName, objectKeys) {
+    if (!objectKeys || objectKeys.length === 0) return
+    const awsS3 = new AWS.S3({ region })
+    const chunkSize = 1000
+    for (let i = 0; i < objectKeys.length; i += chunkSize) {
+      const chunk = objectKeys.slice(i, i + chunkSize).map((key) => ({ Key: key }))
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve, reject) => {
+        const params = {
+          Bucket: bucketName,
+          Delete: {
+            Objects: chunk,
+            Quiet: true
+          }
+        }
+        awsS3.deleteObjects(params, (err) => {
+          if (err) {
+            return reject(err)
+          }
+          resolve()
+        })
+      })
+    }
+  }
+
   copyObject (region, srcBucketName, srcObjectName, destBucketName, destObjectName) {
     const awsS3 = new AWS.S3({ region })
     return new Promise((resolve, reject) => {

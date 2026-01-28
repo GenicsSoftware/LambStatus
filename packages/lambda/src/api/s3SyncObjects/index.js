@@ -3,9 +3,22 @@ import Response from 'aws/cfnResponse'
 
 export async function handle (event, context, callback) {
   if (event.RequestType === 'Delete') {
-    // TODO: handle delete request
-    await Response.sendSuccess(event, context)
-    return
+    const params = event.ResourceProperties || {}
+    const { DestinationRegion: region, DestinationBucket } = params
+    try {
+      if (region && DestinationBucket) {
+        const s3 = new S3()
+        const objects = await s3.listAllObjects(region, DestinationBucket, '')
+        await s3.deleteObjects(region, DestinationBucket, objects.map((obj) => obj.Key))
+      }
+      await Response.sendSuccess(event, context)
+      return
+    } catch (error) {
+      console.log(error.message)
+      console.log(error.stack)
+      await Response.sendFailed(event, context)
+      return
+    }
   }
 
   const params = event.ResourceProperties
@@ -25,6 +38,10 @@ export async function handle (event, context, callback) {
     const objects = await s3.listObjects(region, SourceBucket, SourceKey)
     await Promise.all(objects.map(async (obj) => {
       const destKey = obj.Key.replace(SourceKey + '/', '')
+      // Skip "directory placeholder" objects that would result in empty keys.
+      if (!destKey || obj.Key === SourceKey || obj.Key.endsWith('/')) {
+        return
+      }
       await s3.copyObject(region, SourceBucket, obj.Key, DestinationBucket, destKey)
     }))
     await Response.sendSuccess(event, context)

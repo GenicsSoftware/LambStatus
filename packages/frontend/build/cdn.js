@@ -1,21 +1,19 @@
-const {spawnSync} = require('child_process')
+const path = require('path')
 
-let depsCache
+const rootDir = path.resolve(__dirname, '..')
 
-const listDependencies = function () {
-  if (depsCache !== undefined) return depsCache
-
-  const rawDeps = spawnSync('npm', ['list', '--json'])
-  depsCache = JSON.parse(rawDeps.stdout)
-  return depsCache
+const resolvePackageJson = function (moduleName, baseDir) {
+  return require.resolve(`${moduleName}/package.json`, { paths: [baseDir] })
 }
 
 const getVersion = function (cdnModule) {
-  let curr = listDependencies()
+  let baseDir = rootDir
   cdnModule.dependedBy.forEach(function (dep) {
-    curr = curr.dependencies[dep]
+    const depPackageJson = resolvePackageJson(dep, baseDir)
+    baseDir = path.dirname(depPackageJson)
   })
-  return curr.dependencies[cdnModule.moduleName].version
+  const packageJson = resolvePackageJson(cdnModule.moduleName, baseDir)
+  return require(packageJson).version
 }
 
 const buildScriptURL = function (cdnModule) {

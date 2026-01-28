@@ -106,8 +106,8 @@ const Checkout = class extends React.Component {
     event.preventDefault()
     this.stripe.redirectToCheckout({
       items: [{ sku: SKUs[this.state.amount], quantity: 1 }],
-      successUrl: `https://lambstatus.github.io/donate?result=success`,
-      cancelUrl: `https://lambstatus.github.io/donate?result=cancel`,
+      successUrl: `https://genicssoftware.github.io/lambstatus.github.io/donate?result=success`,
+      cancelUrl: `https://genicssoftware.github.io/lambstatus.github.io/donate?result=cancel`,
     }).then(({error}) => {
       if (error) {
         console.warn('Error:', error)
