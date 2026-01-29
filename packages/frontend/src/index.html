@@ -17,6 +17,12 @@
   <script src="<%= htmlWebpackPlugin.options.scripts[i] %>"></script>
   <% } %>
   <script src="/material.min.js"></script>
-  <script src="/settings.js"></script>
+  <script>
+    (function () {
+      var settingsScript = document.createElement('script');
+      settingsScript.src = '/settings.js?v=' + Date.now();
+      document.body.appendChild(settingsScript);
+    })();
+  </script>
 </body>
 </html>

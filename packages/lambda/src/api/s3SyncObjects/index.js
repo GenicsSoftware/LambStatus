@@ -5,18 +5,19 @@ export async function handle (event, context, callback) {
   if (event.RequestType === 'Delete') {
     const params = event.ResourceProperties || {}
     const { DestinationRegion: region, DestinationBucket } = params
+    const physicalResourceId = DestinationBucket ? `S3SyncObjects-${DestinationBucket}` : undefined
     try {
       if (region && DestinationBucket) {
         const s3 = new S3()
         const objects = await s3.listAllObjects(region, DestinationBucket, '')
         await s3.deleteObjects(region, DestinationBucket, objects.map((obj) => obj.Key))
       }
-      await Response.sendSuccess(event, context)
+      await Response.sendSuccess(event, context, null, physicalResourceId)
       return
     } catch (error) {
       console.log(error.message)
       console.log(error.stack)
-      await Response.sendFailed(event, context)
+      await Response.sendFailed(event, context, null, physicalResourceId)
       return
     }
   }
@@ -33,6 +34,7 @@ export async function handle (event, context, callback) {
     DestinationRegion: region,
     DestinationBucket
   } = params
+  const physicalResourceId = DestinationBucket ? `S3SyncObjects-${DestinationBucket}` : undefined
   try {
     const s3 = new S3()
     const objects = await s3.listObjects(region, SourceBucket, SourceKey)
@@ -44,10 +46,10 @@ export async function handle (event, context, callback) {
       }
       await s3.copyObject(region, SourceBucket, obj.Key, DestinationBucket, destKey)
     }))
-    await Response.sendSuccess(event, context)
+    await Response.sendSuccess(event, context, null, physicalResourceId)
   } catch (error) {
     console.log(error.message)
     console.log(error.stack)
-    await Response.sendFailed(event, context)
+    await Response.sendFailed(event, context, null, physicalResourceId)
   }
 }

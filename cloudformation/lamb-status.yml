@@ -29,10 +29,14 @@ Parameters:
   AdminPageURL:
     Description: Optional. See lambstatus.github.io/set-up-custom-domain for usage
     Type: CommaDelimitedList
+  SettingsUpdateToken:
+    Description: Change this value to force settings.js to be regenerated.
+    Type: String
+    Default: ""
 Mappings:
   Constants:
     LambStatus:
-      Version: 0.6.6
+      Version: 0.6.9
 Conditions:
   UseDefaultStatusPageSSLCertificate:
     !Equals [ !Ref StatusPageSSLCertificate, "" ]
@@ -4207,13 +4211,16 @@ Resources:
       Bucket:
         Ref: StatusPageS3
       Key: settings.js
+      UpdateToken: !Ref SettingsUpdateToken
       Body: !Sub
         - __LAMBSTATUS_API_URL__ = 'https://${Domain}';
         - Domain: !If
           - UseDefaultStatusPageURL
           - !Sub ${StatusPageDistribution.DomainName}
           - !Select ["0", !Ref StatusPageURL]
-      CacheControl: max-age=300
+      CacheControl: no-cache
+    DependsOn:
+      - StatusPageFrontend
   AdminPageApiInfo:
     Type: Custom::S3PutObject
     Properties:
@@ -4226,13 +4233,16 @@ Resources:
       Bucket:
         Ref: AdminPageS3
       Key: settings.js
+      UpdateToken: !Ref SettingsUpdateToken
       Body: !Sub
         - __LAMBSTATUS_API_URL__ = 'https://${Domain}';__LAMBSTATUS_USER_POOL_ID__ = '${CognitoUserPool.UserPoolID}';__LAMBSTATUS_CLIENT_ID__ = '${CognitoUserPoolClient.UserPoolClientID}';
         - Domain: !If
           - UseDefaultAdminPageURL
           - !Sub ${AdminPageDistribution.DomainName}
           - !Select ["0", !Ref AdminPageURL]
-      CacheControl: max-age=300
+      CacheControl: no-cache
+    DependsOn:
+      - AdminPageFrontend
   DBInitialItems:
     Type: Custom::DBCreateItems
     Properties:

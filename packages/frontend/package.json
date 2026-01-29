@@ -4,8 +4,8 @@
   "description": "Frontend for LambStatus",
   "main": "index.js",
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=24.0.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "clean": "rimraf dist",

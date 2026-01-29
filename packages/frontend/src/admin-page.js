@@ -96,12 +96,15 @@ if (__DEV__) {
 let counter = 0
 const timer = setInterval(() => {
   counter++
-  if (typeof __LAMBSTATUS_API_URL__ !== 'undefined') {
+  if (typeof __LAMBSTATUS_API_URL__ !== 'undefined' &&
+      typeof __LAMBSTATUS_USER_POOL_ID__ !== 'undefined' &&
+      typeof __LAMBSTATUS_CLIENT_ID__ !== 'undefined') {
     clearInterval(timer)
 
     settings.apiURL = __LAMBSTATUS_API_URL__
-    settings.userPoolId = __LAMBSTATUS_USER_POOL_ID__
-    settings.clientId = __LAMBSTATUS_CLIENT_ID__
+    settings.userPoolId = (__LAMBSTATUS_USER_POOL_ID__ || '').trim()
+    settings.clientId = (__LAMBSTATUS_CLIENT_ID__ || '').trim()
+
     render(routes)
   }
   if (counter >= 6000) {
